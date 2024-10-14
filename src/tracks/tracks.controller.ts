@@ -7,7 +7,7 @@ import {
   Param,
   Post,
   Query,
-  UploadedFile,
+  UploadedFile, UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -15,6 +15,8 @@ import { Track, TrackDocument } from '../schemas/track.schema';
 import { Model } from 'mongoose';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateTrackDto } from './create-tracks.dto';
+import {TokenAuthGuard} from "../auth/token-auth.guard";
+import {PermitGuard} from "../auth/permit.guard";
 
 @Controller('tracks')
 export class TracksController {
@@ -36,6 +38,7 @@ export class TracksController {
     return tracks;
   }
 
+  @UseGuards(TokenAuthGuard, new PermitGuard(['admin']))
   @Delete(':id')
   async deleteOne(@Param('id') id: string) {
     const track = await this.trackModel.findById({ _id: id });
@@ -48,6 +51,7 @@ export class TracksController {
     return track;
   }
 
+  @UseGuards(TokenAuthGuard)
   @Post()
   @UseInterceptors(FileInterceptor('image', { dest: './public/images' }))
   async create(
