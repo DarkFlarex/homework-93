@@ -5,6 +5,7 @@ import {InjectModel} from "@nestjs/mongoose";
 import { Request } from 'express';
 import {AuthGuard} from "@nestjs/passport";
 import {RegisterUserDto} from "./dto/register-user.dto";
+import {TokenAuthGuard} from "../auth/token-auth.guard";
 
 @Controller('users')
 export class UsersController {
@@ -27,5 +28,15 @@ export class UsersController {
     @Post('sessions')
     async login(@Req() req: Request) {
         return req.user;
+    }
+
+    @UseGuards(TokenAuthGuard)
+    @Delete('sessions')
+    async logout(@Req() req: Request) {
+        const user = req.user as UserDocument;
+        user.generateToken();
+        await user.save();
+
+        return { message: `Logout in: ${user.email}` };
     }
 }
