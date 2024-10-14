@@ -8,8 +8,12 @@ import { AlbumsController } from './albums/albums.controller';
 import { Album, AlbumSchema } from './schemas/album.schema';
 import { TracksController } from './tracks/tracks.controller';
 import { Track, TrackSchema } from './schemas/track.schema';
+import { AuthService } from './auth/auth.service';
+import { UsersController } from './users/users.controller';
 import {User, UserSchema} from "./schemas/user.schema";
-
+import {UniqueUserEmailConstraint} from "./users/validators/unique-user-email.validator";
+import {LocalStrategy} from "./auth/local.strategy";
+import {PermitGuard} from "./auth/permit.guard";
 
 @Module({
   imports: [
@@ -26,7 +30,14 @@ import {User, UserSchema} from "./schemas/user.schema";
     ArtistsController,
     AlbumsController,
     TracksController,
+    UsersController,
   ],
-  providers: [AppService],
+  providers: [
+    AppService,
+    AuthService,
+    UniqueUserEmailConstraint,
+    LocalStrategy,
+    PermitGuard,
+  ],
 })
 export class AppModule {}
